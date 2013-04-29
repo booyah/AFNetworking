@@ -24,6 +24,11 @@
 
 #import <Availability.h>
 
+#ifdef APPORTABLE
+#import <SystemConfiguration/SystemConfiguration.h>
+#import <SystemConfiguration/SCNetworkReachability.h>
+#endif
+
 /**
  `AFURLConnectionOperation` is a subclass of `NSOperation` that implements `NSURLConnection` delegate methods.
 

@@ -39,6 +39,18 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#ifdef APPORTABLE
+@interface NSPropertyListSerialization (ApportablePlatformFix)
++ (NSData *)dataWithPropertyList:(id)plist format:(NSPropertyListFormat)format options:(NSPropertyListWriteOptions)opt error:(out NSError **)error;
+@end
+@implementation NSPropertyListSerialization (ApportablePlatformFix)
++ (NSData *)dataWithPropertyList:(id)plist format:(NSPropertyListFormat)format options:(NSPropertyListWriteOptions)opt error:(out NSError **)error {
+    NSString* errorDesc;
+    return [self dataFromPropertyList:plist format:format errorDescription:&errorDesc];
+}
+@end
+#endif
+
 #ifdef _SYSTEMCONFIGURATION_H
 NSString * const AFNetworkingReachabilityDidChangeNotification = @"com.alamofire.networking.reachability.change";
 NSString * const AFNetworkingReachabilityNotificationStatusItem = @"AFNetworkingReachabilityNotificationStatusItem";
@@ -363,7 +375,7 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
     SCNetworkReachabilityContext context = {0, (__bridge void *)callback, AFNetworkReachabilityRetainCallback, AFNetworkReachabilityReleaseCallback, NULL};
     SCNetworkReachabilitySetCallback(self.networkReachability, AFNetworkReachabilityCallback, &context);
-    SCNetworkReachabilityScheduleWithRunLoop(self.networkReachability, CFRunLoopGetMain(), (CFStringRef)NSRunLoopCommonModes);
+    SCNetworkReachabilityScheduleWithRunLoop(self.networkReachability, CFRunLoopGetMain(), (__bridge CFStringRef)NSRunLoopCommonModes);
 
     /* Network reachability monitoring does not establish a baseline for IP addresses as it does for hostnames, so if the base URL host is an IP address, the initial reachability callback is manually triggered.
      */
@@ -379,7 +391,7 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 
 - (void)stopMonitoringNetworkReachability {
     if (_networkReachability) {
-        SCNetworkReachabilityUnscheduleFromRunLoop(_networkReachability, CFRunLoopGetMain(), (CFStringRef)NSRunLoopCommonModes);
+        SCNetworkReachabilityUnscheduleFromRunLoop(_networkReachability, CFRunLoopGetMain(), (__bridge CFStringRef)NSRunLoopCommonModes);
         CFRelease(_networkReachability);
         _networkReachability = NULL;
     }
